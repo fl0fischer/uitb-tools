@@ -15,15 +15,14 @@ logging.getLogger().setLevel(logging.INFO)
 
 PLOTS_DIR_DEFAULT = os.path.abspath("../_plots/")
 
-INDEPENDENT_JOINTS = [  # 'eye-rx',
-    # 'eye-ry',
+INDEPENDENT_JOINTS = [
     'elv_angle',
     'shoulder_elv',
     'shoulder_rot',
     'elbow_flexion',
     'pro_sup',
-    # 'deviation',
-    # 'flexion'
+    'deviation',
+    'flexion'
 ]
 
 ACTUATOR_NAMES = ['DELT1',
@@ -232,7 +231,7 @@ class TrajectoryData(object):
                                                              self.target_radius_series[current_idx + 1])[0]
                 except:  # use "inside_target" column
                     relindices_insidetarget_trial = \
-                    np.where(self.data[self.data_key]["inside_target"][current_idx + 1:next_idx])[0]
+                        np.where(self.data[self.data_key]["inside_target"][current_idx + 1:next_idx])[0]
                 assert len(
                     relindices_insidetarget_trial) > 0, "Using target boundary instead of target center as desired target position failed."
                 targetbound_idx = (current_idx + 1 + relindices_insidetarget_trial[
@@ -294,7 +293,7 @@ class TrajectoryData(object):
                                                              self.target_radius_series[current_idx + 1])[0]
                 except:  # use "inside_target" column
                     relindices_insidetarget_trial = \
-                    np.where(self.data[self.data_key]["inside_target"][current_idx + 1:next_idx])[0]
+                        np.where(self.data[self.data_key]["inside_target"][current_idx + 1:next_idx])[0]
 
                 assert len(
                     relindices_insidetarget_trial) > 0, "Using target boundary instead of target center as desired target position failed."
@@ -389,7 +388,7 @@ class TrajectoryData(object):
                                                              self.target_radius_series[current_idx + 1])[0]
                 except:  # use "inside_target" column
                     relindices_insidetarget_trial = \
-                    np.where(self.data[self.data_key]["inside_target"][current_idx + 1:next_idx])[0]
+                        np.where(self.data[self.data_key]["inside_target"][current_idx + 1:next_idx])[0]
 
                 assert len(
                     relindices_insidetarget_trial) > 0, "Using target boundary instead of target center as desired target position failed."
@@ -446,7 +445,7 @@ class TrajectoryData(object):
                                                               current_idx + 1])[0]
         except:  # use "inside_target" column
             self.relindices_insidetarget_trial = \
-            np.where(self.data[self.data_key]["inside_target"][current_idx + 1:next_idx])[0]
+                np.where(self.data[self.data_key]["inside_target"][current_idx + 1:next_idx])[0]
 
         next_idx_copy = next_idx
         if self.trial_targetbound_as_target:
@@ -470,7 +469,7 @@ class TrajectoryData(object):
         time_series_shifted = np.array(self.time_series[current_idx: next_idx]) - self.time_series[current_idx]
         if normalize_time:
             time_series_shifted = (time_series_shifted - time_series_shifted[0]) / (
-                        time_series_shifted[-1] - time_series_shifted[0])
+                    time_series_shifted[-1] - time_series_shifted[0])
         self.time_series_trial = time_series_shifted
 
         self.target_position_series_trial = self.target_position_series[current_idx: next_idx]
@@ -522,7 +521,7 @@ class TrajectoryData(object):
             position_series_trial_insidetarget = np.array(self.position_series[current_idx + 1: next_idx_copy])[
                 self.relindices_insidetarget_trial]
             self.endeffector_insidetarget_covariance = np.cov(position_series_trial_insidetarget, rowvar=False) if \
-            position_series_trial_insidetarget.shape[0] != 1 else np.zeros(
+                position_series_trial_insidetarget.shape[0] != 1 else np.zeros(
                 (position_series_trial_insidetarget.shape[1], position_series_trial_insidetarget.shape[1]))
 
 
@@ -586,7 +585,7 @@ class TrajectoryData_RL(TrajectoryData):
     def __init__(self, DIRNAME_SIMULATION, filename, REPEATED_MOVEMENTS=False,
                  independent_joints=None):
 
-        self.DIRNAME_SIMULATION = DIRNAME_SIMULATION
+        self.DIRNAME_SIMULATION = os.path.abspath(DIRNAME_SIMULATION)
         self.filepath = os.path.join(self.DIRNAME_SIMULATION, filename)  # warning: here, "self.filepath" is directory!
         self.REPEATED_MOVEMENTS = REPEATED_MOVEMENTS  # if True, combine individual log files into one data structure
 
@@ -814,8 +813,8 @@ class TrajectoryData_RL(TrajectoryData):
                                 current_indices = []
                             if len(current_indices) <= 2:  # recompute self._indices based on switches in target position
                                 current_indices = \
-                                np.where(np.diff(np.squeeze(self._target_position_series[-1]), axis=0).sum(axis=1))[
-                                    0] + 1
+                                    np.where(np.diff(np.squeeze(self._target_position_series[-1]), axis=0).sum(axis=1))[
+                                        0] + 1
                             assert len(
                                 current_indices) > 2, f"Current_indices ({current_indices}) should have more than 2 entries."
                         else:
@@ -903,7 +902,7 @@ class TrajectoryData_RL(TrajectoryData):
                         current_indices = []
                     if len(current_indices) <= 2:  # recompute self._indices based on switches in target position
                         current_indices = \
-                        np.where(np.diff(np.squeeze(self._target_position_series[-1]), axis=0).sum(axis=1))[0] + 1
+                            np.where(np.diff(np.squeeze(self._target_position_series[-1]), axis=0).sum(axis=1))[0] + 1
                     assert len(
                         current_indices) > 2, f"Current_indices ({current_indices}) should have more than 2 entries."
                 else:
@@ -1132,10 +1131,10 @@ class TrajectoryData_RL(TrajectoryData):
 
         # Aggregate selected_movements_indices according to AGGREGATION_VARS, using only trials preselected via TARGET_IDS and TRIALS_IDS/META_IDS/N_MOVS:
         preselection_include_target_ids = lambda \
-            target_id: target_id in self.TARGET_IDS if self.TARGET_IDS is not None else True
+                target_id: target_id in self.TARGET_IDS if self.TARGET_IDS is not None else True
         preselection_include_trials = lambda k: (k in self.TRIAL_IDS) if self.TRIAL_IDS is not None else (
-                    k in self.META_IDS) if self.META_IDS is not None else (
-                    k in range(self.N_MOVS)) if self.N_MOVS is not None else True
+                k in self.META_IDS) if self.META_IDS is not None else (
+                k in range(self.N_MOVS)) if self.N_MOVS is not None else True
         self.selected_movements_indices = [self.selected_movements_indices[np.where([all([getattr(self,
                                                                                                   f"_{agg_var}_idx_trials")[
                                                                                               k] == i[j] for j, agg_var
@@ -1156,7 +1155,7 @@ class TrajectoryData_RL(TrajectoryData):
         self.selected_movements_indices = [tuple(
             [selected_movements_indices_selection_trial[j] for selected_movements_indices_selection_trial in
              selected_movements_indices_selection] for j in range(3)) for selected_movements_indices_selection in
-                                           self.selected_movements_indices_swapped]
+            self.selected_movements_indices_swapped]
 
         # if self.TRIAL_IDS is not None:
         #     self.META_IDS = self.TRIAL_IDS
@@ -1176,38 +1175,38 @@ class TrajectoryData_STUDY(TrajectoryData):
     STUDY_DIRECTION_NUMS = 13  # number of targets in experimental ISO task
 
     # trial IDs of movements used to identify the optimal cost weights in MPC (should thus be neglected when comparing study data to MPC data)
-    trainingset_indices = {'U1, Standing_ID_ISO_15_plane': [31, 30, 29, 28, 27],
-                           'U1, Standing_Cursor_Handtuned_ISO_15_plane': [31, 30, 29, 28, 27],
-                           'U1, Standing_Pad_ID_ISO_15_plane': [30, 29, 28, 27, 26],
-                           'U1, Standing_Pad_Handtuned_vertical_ISO_15_plane': [31, 30, 29, 28, 27],
-                           'U2, Standing_ID_ISO_15_plane': [24, 23, 22, 21, 20],
-                           'U2, Standing_Cursor_Handtuned_ISO_15_plane': [46, 45, 44, 43, 42],
-                           'U2, Standing_Pad_ID_ISO_15_plane': [30, 29, 28, 27, 26],
-                           'U2, Standing_Pad_Handtuned_vertical_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U3, Standing_ID_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U3, Standing_Cursor_Handtuned_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U3, Standing_Pad_ID_ISO_15_plane': [31, 30, 29, 28, 27],
-                           'U3, Standing_Pad_Handtuned_vertical_ISO_15_plane': [33, 32, 31, 30, 29],
-                           'U4, Standing_ID_ISO_15_plane': [33, 32, 31, 30, 29],
-                           'U4, Standing_Cursor_Handtuned_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U4, Standing_Pad_ID_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U4, Standing_Pad_Handtuned_vertical_ISO_15_plane': [31, 30, 29, 28, 27],
-                           'U5, Standing_ID_ISO_15_plane': [30, 29, 28, 27, 26],
-                           'U5, Standing_Cursor_Handtuned_ISO_15_plane': [27, 26, 25, 24, 22],
-                           'U5, Standing_Pad_ID_ISO_15_plane': [27, 26, 25, 24, 23],
-                           'U5, Standing_Pad_Handtuned_vertical_ISO_15_plane': [26, 25, 24, 23, 20],
-                           'U6, Standing_ID_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U6, Standing_Cursor_Handtuned_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U6, Standing_Pad_ID_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U6, Standing_Pad_Handtuned_vertical_ISO_15_plane': [31, 30, 29, 28, 27]}
+    trainingset_indices = {'U1, Standing_ID_ISO_15_plane': [27, 28, 29, 30, 31],
+                           'U1, Standing_Cursor_Handtuned_ISO_15_plane': [27, 28, 29, 30, 31],
+                           'U1, Standing_Pad_ID_ISO_15_plane': [26, 27, 28, 29, 30],
+                           'U1, Standing_Pad_Handtuned_vertical_ISO_15_plane': [27, 28, 29, 30, 31],
+                           'U2, Standing_ID_ISO_15_plane': [20, 21, 22, 23, 24],
+                           'U2, Standing_Cursor_Handtuned_ISO_15_plane': [42, 43, 44, 45, 46],
+                           'U2, Standing_Pad_ID_ISO_15_plane': [26, 27, 28, 29, 30],
+                           'U2, Standing_Pad_Handtuned_vertical_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U3, Standing_ID_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U3, Standing_Cursor_Handtuned_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U3, Standing_Pad_ID_ISO_15_plane': [27, 28, 29, 30, 31],
+                           'U3, Standing_Pad_Handtuned_vertical_ISO_15_plane': [29, 30, 31, 32, 33],
+                           'U4, Standing_ID_ISO_15_plane': [29, 30, 31, 32, 33],
+                           'U4, Standing_Cursor_Handtuned_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U4, Standing_Pad_ID_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U4, Standing_Pad_Handtuned_vertical_ISO_15_plane': [27, 28, 29, 30, 31],
+                           'U5, Standing_ID_ISO_15_plane': [26, 27, 28, 29, 30],
+                           'U5, Standing_Cursor_Handtuned_ISO_15_plane': [22, 24, 25, 26, 27],
+                           'U5, Standing_Pad_ID_ISO_15_plane': [23, 24, 25, 26, 27],
+                           'U5, Standing_Pad_Handtuned_vertical_ISO_15_plane': [20, 23, 24, 25, 26],
+                           'U6, Standing_ID_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U6, Standing_Cursor_Handtuned_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U6, Standing_Pad_ID_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U6, Standing_Pad_Handtuned_vertical_ISO_15_plane': [27, 28, 29, 30, 31]}
 
     def __init__(self, DIRNAME_STUDY, USER_ID="U1", TASK_CONDITION="Standing_ID_ISO_15_plane",
                  FILENAME_STUDY_TARGETPOSITIONS=None,
                  independent_joints=None, actuator_names=None):
         self.USER_ID = USER_ID
         self.TASK_CONDITION = TASK_CONDITION
-        
-        self.DIRNAME_STUDY = DIRNAME_STUDY
+
+        self.DIRNAME_STUDY = os.path.abspath(DIRNAME_STUDY)
         self.FILENAME_STUDY_TARGETPOSITIONS = FILENAME_STUDY_TARGETPOSITIONS
 
         if independent_joints is None:
@@ -1310,39 +1309,36 @@ class TrajectoryData_STUDY(TrajectoryData):
 
         try:
             data_markers_STUDY = pd.read_csv(os.path.join(self.DIRNAME_STUDY,
-                f"{USER_ID}/P1_filtered/PhaseSpace_{USER_ID}_{TASK_CONDITION}.csv"))
+                                                          f"Marker/{USER_ID}_{TASK_CONDITION}.csv"))
             data_IK_STUDY = pd.read_csv(os.path.join(self.DIRNAME_STUDY,
-                f"{USER_ID}/P3_filtered/PhaseSpace_{USER_ID}_{TASK_CONDITION}.csv"))
+                                                     f"IK/{USER_ID}_{TASK_CONDITION}.csv"))
             data_ID_STUDY = pd.read_csv(os.path.join(self.DIRNAME_STUDY,
-                f"{USER_ID}/P4_filtered/PhaseSpace_{USER_ID}_{TASK_CONDITION}.csv"))
-        except FileNotFoundError:
-            data_markers_STUDY = pd.read_csv(os.path.join(self.DIRNAME_STUDY,
-                f"{USER_ID}/P1_filtered/PhaseSpace_{USER_ID}_{TASK_CONDITION}.csv"))
-            data_IK_STUDY = pd.read_csv(os.path.join(self.DIRNAME_STUDY,
-                f"{USER_ID}/P3_filtered/PhaseSpace_{USER_ID}_{TASK_CONDITION}.csv"))
-            data_ID_STUDY = pd.read_csv(os.path.join(self.DIRNAME_STUDY,
-                f"{USER_ID}/P4_filtered/PhaseSpace_{USER_ID}_{TASK_CONDITION}.csv"))
+                                                     f"ID/{USER_ID}_{TASK_CONDITION}.csv"))
+        except FileNotFoundError as e:
+            logging.error(f"Required files from user study cannot be found!")
+            raise e
 
         # interpolate data_ID_STUDY at time steps of data_IK_STUDY
         data_ID_STUDY_interpolated = \
-        pd.concat((data_IK_STUDY.set_index("time"), data_ID_STUDY.set_index("time")), axis=1).loc[:,
-        data_ID_STUDY.set_index("time").columns].sort_index().interpolate(method="index").loc[
-            data_IK_STUDY["time"]].reset_index()
+            pd.concat((data_IK_STUDY.set_index("time"), data_ID_STUDY.set_index("time")), axis=1).loc[:,
+            data_ID_STUDY.set_index("time").columns].sort_index().interpolate(method="index").loc[
+                data_IK_STUDY["time"]].reset_index()
 
         try:
             # data_StaticOptimization_STUDY = pd.read_csv(os.path.join(self.DIRNAME_STUDY, f"{USER_ID}/P5/PhaseSpace_{USER_ID}_{TASK_CONDITION}_Cropped_Free_StaticOptimization_activation.sto"), skiprows=8, delimiter="\t")
             data_StaticOptimization_STUDY = self._control_xml_to_DataFrame(os.path.join(self.DIRNAME_STUDY,
-                f"{USER_ID}/P5/PhaseSpace_{USER_ID}_{TASK_CONDITION}_Cropped_Free_StaticOptimization_controls.xml"))
+                                                                                        f"StaticOptimization/{USER_ID}_{TASK_CONDITION}_Cropped_Free_StaticOptimization_controls.xml"))
 
             # interpolate data_StaticOptimization_STUDY at time steps of data_IK_STUDY
             data_StaticOptimization_STUDY_interpolated = \
-            pd.concat((data_IK_STUDY.set_index("time"), data_StaticOptimization_STUDY.set_index("time")), axis=1).loc[:,
-            data_StaticOptimization_STUDY.set_index("time").columns].sort_index().interpolate(method="index").loc[
-                data_IK_STUDY["time"]].reset_index()
+                pd.concat((data_IK_STUDY.set_index("time"), data_StaticOptimization_STUDY.set_index("time")),
+                          axis=1).loc[:,
+                data_StaticOptimization_STUDY.set_index("time").columns].sort_index().interpolate(method="index").loc[
+                    data_IK_STUDY["time"]].reset_index()
             # TODO: are StaticOpimization files time-aligned with other files??
             self.static_optimization_loaded = True
         except FileNotFoundError:
-            logging.error(f"Cannot load StaticOptimization Data ({self.USER_ID}, {self.TASK_CONDITION}).")
+            logging.warning(f"Cannot load StaticOptimization Data ({self.USER_ID}, {self.TASK_CONDITION}).")
             data_StaticOptimization_STUDY_interpolated = pd.DataFrame()
             self.static_optimization_loaded = False
 
@@ -1356,8 +1352,8 @@ class TrajectoryData_STUDY(TrajectoryData):
 
         # load indices of individual trials (IMPORTANT INFO: depending on the preprocessing, the initial indices might exclude reaction times, i.e., they might correspond to the first time step after the new target occured at which some initial position/velocity/acceleration constraints were satisfied))
         self._indices = np.load(os.path.join(self.DIRNAME_STUDY,
-            f'{self.USER_ID}/PhaseSpace_{self.USER_ID}_{self.TASK_CONDITION}_SubMovIndices.npy'),
-            allow_pickle=True)
+                                             f'_trialIndices/{self.USER_ID}_{self.TASK_CONDITION}_SubMovIndices.npy'),
+                                allow_pickle=True)
 
         self._position_series = self.data.loc[:, [f"end_effector_pos_{xyz}" for xyz in ("X", "Y", "Z")]].values
         self._velocity_series = self.data.loc[:, [f"end_effector_vel_{xyz}" for xyz in ("X", "Y", "Z")]].values
@@ -1401,7 +1397,8 @@ class TrajectoryData_STUDY(TrajectoryData):
 
         self.preprocessed = True
 
-    def compute_indices(self, TARGET_IDS=None, TRIAL_IDS=None, META_IDS=None, N_MOVS=None, AGGREGATION_VARS=[], ignore_trainingset_trials=False):
+    def compute_indices(self, TARGET_IDS=None, TRIAL_IDS=None, META_IDS=None, N_MOVS=None, AGGREGATION_VARS=[],
+                        ignore_trainingset_trials=False):
         self.TARGET_IDS = TARGET_IDS  # Target ID [second-last column of self.indices]; if None: use TRIAL_IDS
         self.TRIAL_IDS = TRIAL_IDS  # Trial ID [last column of self.indices]; can be combined with self.TARGET_IDS; if None: use META_IDS
         self.META_IDS = META_IDS  # index positions (i.e., sequential numbering of trials in indices, without counting removed outliers); if None: use N_MOVS
@@ -1442,77 +1439,77 @@ class TrajectoryData_STUDY(TrajectoryData):
                     self.selected_movements_indices = [list(
                         zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                             self._indices[direction_meta_indices, 1])) for target_idx in self.TARGET_IDS if
-                                                       len(direction_meta_indices := np.where(
-                                                           (self._indices[:, 3] == target_idx) & np.isin(
-                                                               self.indices[:, 4], self.TRIAL_IDS))[0]) > 0 if
-                                                       len(direction_meta_indices_before := np.where((self._indices[:,
-                                                                                                      3] == (
-                                                                                                                  target_idx - 1) % self.STUDY_DIRECTION_NUMS) & np.isin(
-                                                           self.indices[:, 4], self.TRIAL_IDS))[0]) > 0]
+                        len(direction_meta_indices := np.where(
+                            (self._indices[:, 3] == target_idx) & np.isin(
+                                self.indices[:, 4], self.TRIAL_IDS))[0]) > 0 if
+                        len(direction_meta_indices_before := np.where((self._indices[:,
+                                                                       3] == (
+                                                                               target_idx - 1) % self.STUDY_DIRECTION_NUMS) & np.isin(
+                            self.indices[:, 4], self.TRIAL_IDS))[0]) > 0]
                 else:
                     self.selected_movements_indices = [list(
                         zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                             self._indices[direction_meta_indices, 1])) for target_idx in self.TARGET_IDS if
-                                                       len(direction_meta_indices :=
-                                                           np.where((self._indices[:, 3] == target_idx))[0]) > 0 if
-                                                       len(direction_meta_indices_before := np.where((self._indices[:,
-                                                                                                      3] == (
-                                                                                                                  target_idx - 1) % self.STUDY_DIRECTION_NUMS))[
-                                                           0]) > 0]
+                        len(direction_meta_indices :=
+                            np.where((self._indices[:, 3] == target_idx))[0]) > 0 if
+                        len(direction_meta_indices_before := np.where((self._indices[:,
+                                                                       3] == (
+                                                                               target_idx - 1) % self.STUDY_DIRECTION_NUMS))[
+                            0]) > 0]
                 # pass #this if-condition can be removed, as it was only added to ensure consistency with TrajectoriesData_RL
             elif self.TRIAL_IDS is not None:
                 self.selected_movements_indices = [list(
                     zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                         self._indices[direction_meta_indices, 1])) for target_idx in
-                                                   list(range(1, self.STUDY_DIRECTION_NUMS)) + [0] if
-                                                   len(direction_meta_indices := np.where(
-                                                       (self._indices[:, 3] == target_idx) & (
-                                                           np.isin(self.indices[:, 4], self.TRIAL_IDS)))[0]) > 0 if
-                                                   len(direction_meta_indices_before := np.where((self._indices[:,
-                                                                                                  3] == (
-                                                                                                              target_idx - 1) % self.STUDY_DIRECTION_NUMS))[
-                                                       0]) > 0]
+                    list(range(1, self.STUDY_DIRECTION_NUMS)) + [0] if
+                    len(direction_meta_indices := np.where(
+                        (self._indices[:, 3] == target_idx) & (
+                            np.isin(self.indices[:, 4], self.TRIAL_IDS)))[0]) > 0 if
+                    len(direction_meta_indices_before := np.where((self._indices[:,
+                                                                   3] == (
+                                                                           target_idx - 1) % self.STUDY_DIRECTION_NUMS))[
+                        0]) > 0]
             elif self.META_IDS is not None:
                 self.selected_movements_indices = [list(
                     zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                         self._indices[direction_meta_indices, 1])) for target_idx in
-                                                   list(range(1, self.STUDY_DIRECTION_NUMS)) + [0] if
-                                                   len(direction_meta_indices := np.where(
-                                                       (self._indices[:, 3] == target_idx) & (
-                                                           np.isin(np.arange(len(self._indices)), self.META_IDS)))[
-                                                       0]) > 0 if len(direction_meta_indices_before := np.where(
+                    list(range(1, self.STUDY_DIRECTION_NUMS)) + [0] if
+                    len(direction_meta_indices := np.where(
+                        (self._indices[:, 3] == target_idx) & (
+                            np.isin(np.arange(len(self._indices)), self.META_IDS)))[
+                        0]) > 0 if len(direction_meta_indices_before := np.where(
                         (self._indices[:, 3] == (target_idx - 1) % self.STUDY_DIRECTION_NUMS))[0]) > 0]
             elif self.N_MOVS is not None:
                 self.selected_movements_indices = [list(
                     zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                         self._indices[direction_meta_indices, 1])) for target_idx in
-                                                   list(range(1, self.STUDY_DIRECTION_NUMS)) + [0] if
-                                                   len(direction_meta_indices := np.where(
-                                                       (self._indices[:, 3] == target_idx) & (
-                                                           np.isin(np.arange(len(self._indices)),
-                                                                   np.arange(self.N_MOVS))))[0]) > 0 if
-                                                   len(direction_meta_indices_before := np.where((self._indices[:,
-                                                                                                  3] == (
-                                                                                                              target_idx - 1) % self.STUDY_DIRECTION_NUMS))[
-                                                       0]) > 0]
+                    list(range(1, self.STUDY_DIRECTION_NUMS)) + [0] if
+                    len(direction_meta_indices := np.where(
+                        (self._indices[:, 3] == target_idx) & (
+                            np.isin(np.arange(len(self._indices)),
+                                    np.arange(self.N_MOVS))))[0]) > 0 if
+                    len(direction_meta_indices_before := np.where((self._indices[:,
+                                                                   3] == (
+                                                                           target_idx - 1) % self.STUDY_DIRECTION_NUMS))[
+                        0]) > 0]
             else:
                 self.selected_movements_indices = [list(
                     zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                         self._indices[direction_meta_indices, 1])) for target_idx in
-                                                   list(range(1, self.STUDY_DIRECTION_NUMS)) + [0] if
-                                                   len(direction_meta_indices :=
-                                                       np.where((self._indices[:, 3] == target_idx))[0]) > 0 if
-                                                   len(direction_meta_indices_before := np.where((self._indices[:,
-                                                                                                  3] == (
-                                                                                                              target_idx - 1) % self.STUDY_DIRECTION_NUMS))[
-                                                       0]) > 0]
+                    list(range(1, self.STUDY_DIRECTION_NUMS)) + [0] if
+                    len(direction_meta_indices :=
+                        np.where((self._indices[:, 3] == target_idx))[0]) > 0 if
+                    len(direction_meta_indices_before := np.where((self._indices[:,
+                                                                   3] == (
+                                                                           target_idx - 1) % self.STUDY_DIRECTION_NUMS))[
+                        0]) > 0]
                 assert len(self.selected_movements_indices) == self.STUDY_DIRECTION_NUMS
 
                 # concatenate last_idx, current_idx, and next_idx for all selected trials (TARGET_IDS is used afterwards):
             self.selected_movements_indices = [tuple(
                 [selected_movements_indices_direction_trial[j] for selected_movements_indices_direction_trial in
                  selected_movements_indices_direction] for j in range(3)) for selected_movements_indices_direction in
-                                               self.selected_movements_indices]
+                self.selected_movements_indices]
 
         else:
             ##self.selected_movements_indices = list(zisince no mop(np.hstack(([self._indices[self.trials_to_current_init_pos[0], 0]], self._indices[:-1, 0])), self._indices[:, 0], self._indices[:, 1]))
@@ -1529,8 +1526,10 @@ class TrajectoryData_STUDY(TrajectoryData):
                 # Remove trials with initial position never reached (NOTE: if it is ensured, that effective_projection_path==True is used later, these trials do not need to be removed and the first column ("last_idx")) can be set arbitrarily...):
                 closest_meta_indices_processed = [i for i in closest_meta_indices if not np.isnan(i)]
                 if len(closest_meta_indices_processed) < len(closest_meta_indices):
-                    logging.error(f"STUDY ({self.USER_ID}, {self.TASK_CONDITION}) - Removed trials with Trial ID {self.indices[np.where(np.isnan(closest_meta_indices))[0], 4]}, since no movement to initial position (Target(s) {np.unique(self.indices[np.where(np.isnan(closest_meta_indices))[0], 2])}) could be identified.")
-                indices_of_trials_to_current_init_position = np.hstack(([self.indices[closest_meta_indices_processed, 0]]))
+                    logging.error(
+                        f"STUDY ({self.USER_ID}, {self.TASK_CONDITION}) - Removed trials with Trial ID {self.indices[np.where(np.isnan(closest_meta_indices))[0], 4]}, since no movement to initial position (Target(s) {np.unique(self.indices[np.where(np.isnan(closest_meta_indices))[0], 2])}) could be identified.")
+                indices_of_trials_to_current_init_position = np.hstack(
+                    ([self.indices[closest_meta_indices_processed, 0]]))
                 assert len(closest_meta_indices) == len(self._indices)
                 self._indices = self.indices[np.where(~np.isnan(closest_meta_indices))[0], :]
             ### VARIANT 2 (dirty hack (TODO: this definitely needs code clean up!) - directly store target ID with negative sign (and shifted by -100) instead of frame ID in indices_of_trials_to_current_init_position and thus in first column of self.selected_movements_indices, if no movement to the respective init position exists)
@@ -1556,7 +1555,7 @@ class TrajectoryData_STUDY(TrajectoryData):
                 self.selected_movements_indices = [self.selected_movements_indices[i] for i in
                                                    range(len(self.selected_movements_indices)) if
                                                    i not in trainingset_META_IDS]
-                logging.warning(
+                logging.info(
                     f"STUDY ({self.USER_ID}, {self.TASK_CONDITION}) - Ignore training set indices {trainingset_TRIAL_IDS}.")
 
             if self.TARGET_IDS is not None:  # self.TARGET_IDS consists of Target IDs (0, ..., self.STUDY_DIRECTION_NUMS - 1)
@@ -1591,14 +1590,17 @@ class TrajectoryData_STUDY(TrajectoryData):
             target_position_series = self._target_position_series  # [0] if self.AGGREGATE_TRIALS else self._target_position_series
             if not ignore_trainingset_trials:
                 assert len(np.unique(np.round(target_position_series[self._indices[self.trials_to_current_init_pos, 0]],
-                                          decimals=12))) == 3, f"ERROR: Target positions do not match for trials with same init/target id ({target_position_series[self._indices[self.trials_to_current_init_pos, 0]]})!"
+                                              decimals=12))) == 3, f"ERROR: Target positions do not match for trials with same init/target id ({target_position_series[self._indices[self.trials_to_current_init_pos, 0]]})!"
             # self.selected_movements_indices_per_trial = list(zip(np.hstack(([self._indices[self.trials_to_current_init_pos[0], 0]], self._indices[:-1, 0])), self._indices[:, 0], self._indices[:, 1]))
             ### VARIANT 1:  #FLAG123
             if self.FILENAME_STUDY_TARGETPOSITIONS is None:
-                self.target_positions_per_trial = target_position_series[np.squeeze(self.selected_movements_indices)[..., :2], :]
+                self.target_positions_per_trial = target_position_series[
+                                                  np.squeeze(self.selected_movements_indices)[..., :2], :]
             ### VARIANT 2:
             else:
-                self.target_positions_per_trial = np.array([target_position_series[i, :] if i[0]>=0 else [self._target_positions_by_ID[-(i[0]+100)], target_position_series[i[1], :]] for i in np.array(self.selected_movements_indices)[..., :2]])
+                self.target_positions_per_trial = np.array([target_position_series[i, :] if i[0] >= 0 else [
+                    self._target_positions_by_ID[-(i[0] + 100)], target_position_series[i[1], :]] for i in
+                                                            np.array(self.selected_movements_indices)[..., :2]])
             #####################
             self.target_vecs = self.target_positions_per_trial[..., 1, :] - self.target_positions_per_trial[..., 0, :]
             # WARNING: self.selected_movements_indices_per_trial is NOT updated to account for TRIAL_IDS/META_IDS/N_MOVS
@@ -1648,30 +1650,30 @@ class TrajectoryData_MPC(TrajectoryData):
     MPC_DIRECTION_NUMS = 13  # number of targets in experimental ISO task
 
     # trial IDs of movements used to identify the optimal cost weights in MPC (should thus be neglected when comparing study data to MPC data -> set ignore_trainingset_trials=True when calling compute_indices() in BOTH TrajectoryData_MPC and TrajectoryData_STUDY!)
-    trainingset_indices = {'U1, Standing_ID_ISO_15_plane': [31, 30, 29, 28, 27],
-                           'U1, Standing_Cursor_Handtuned_ISO_15_plane': [31, 30, 29, 28, 27],
-                           'U1, Standing_Pad_ID_ISO_15_plane': [30, 29, 28, 27, 26],
-                           'U1, Standing_Pad_Handtuned_vertical_ISO_15_plane': [31, 30, 29, 28, 27],
-                           'U2, Standing_ID_ISO_15_plane': [24, 23, 22, 21, 20],
-                           'U2, Standing_Cursor_Handtuned_ISO_15_plane': [46, 45, 44, 43, 42],
-                           'U2, Standing_Pad_ID_ISO_15_plane': [30, 29, 28, 27, 26],
-                           'U2, Standing_Pad_Handtuned_vertical_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U3, Standing_ID_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U3, Standing_Cursor_Handtuned_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U3, Standing_Pad_ID_ISO_15_plane': [31, 30, 29, 28, 27],
-                           'U3, Standing_Pad_Handtuned_vertical_ISO_15_plane': [33, 32, 31, 30, 29],
-                           'U4, Standing_ID_ISO_15_plane': [33, 32, 31, 30, 29],
-                           'U4, Standing_Cursor_Handtuned_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U4, Standing_Pad_ID_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U4, Standing_Pad_Handtuned_vertical_ISO_15_plane': [31, 30, 29, 28, 27],
-                           'U5, Standing_ID_ISO_15_plane': [30, 29, 28, 27, 26],
-                           'U5, Standing_Cursor_Handtuned_ISO_15_plane': [27, 26, 25, 24, 22],
-                           'U5, Standing_Pad_ID_ISO_15_plane': [27, 26, 25, 24, 23],
-                           'U5, Standing_Pad_Handtuned_vertical_ISO_15_plane': [26, 25, 24, 23, 20],
-                           'U6, Standing_ID_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U6, Standing_Cursor_Handtuned_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U6, Standing_Pad_ID_ISO_15_plane': [32, 31, 30, 29, 28],
-                           'U6, Standing_Pad_Handtuned_vertical_ISO_15_plane': [31, 30, 29, 28, 27]}
+    trainingset_indices = {'U1, Standing_ID_ISO_15_plane': [27, 28, 29, 30, 31],
+                           'U1, Standing_Cursor_Handtuned_ISO_15_plane': [27, 28, 29, 30, 31],
+                           'U1, Standing_Pad_ID_ISO_15_plane': [26, 27, 28, 29, 30],
+                           'U1, Standing_Pad_Handtuned_vertical_ISO_15_plane': [27, 28, 29, 30, 31],
+                           'U2, Standing_ID_ISO_15_plane': [20, 21, 22, 23, 24],
+                           'U2, Standing_Cursor_Handtuned_ISO_15_plane': [42, 43, 44, 45, 46],
+                           'U2, Standing_Pad_ID_ISO_15_plane': [26, 27, 28, 29, 30],
+                           'U2, Standing_Pad_Handtuned_vertical_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U3, Standing_ID_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U3, Standing_Cursor_Handtuned_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U3, Standing_Pad_ID_ISO_15_plane': [27, 28, 29, 30, 31],
+                           'U3, Standing_Pad_Handtuned_vertical_ISO_15_plane': [29, 30, 31, 32, 33],
+                           'U4, Standing_ID_ISO_15_plane': [29, 30, 31, 32, 33],
+                           'U4, Standing_Cursor_Handtuned_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U4, Standing_Pad_ID_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U4, Standing_Pad_Handtuned_vertical_ISO_15_plane': [27, 28, 29, 30, 31],
+                           'U5, Standing_ID_ISO_15_plane': [26, 27, 28, 29, 30],
+                           'U5, Standing_Cursor_Handtuned_ISO_15_plane': [22, 24, 25, 26, 27],
+                           'U5, Standing_Pad_ID_ISO_15_plane': [23, 24, 25, 26, 27],
+                           'U5, Standing_Pad_Handtuned_vertical_ISO_15_plane': [20, 23, 24, 25, 26],
+                           'U6, Standing_ID_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U6, Standing_Cursor_Handtuned_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U6, Standing_Pad_ID_ISO_15_plane': [28, 29, 30, 31, 32],
+                           'U6, Standing_Pad_Handtuned_vertical_ISO_15_plane': [27, 28, 29, 30, 31]}
 
     def __init__(self, DIRNAME_SIMULATION, SIMULATION_SUBDIR, USER_ID="U1", TASK_CONDITION="Standing_ID_ISO_15_plane",
                  FILENAME_STUDY_TARGETPOSITIONS=None,
@@ -1679,7 +1681,7 @@ class TrajectoryData_MPC(TrajectoryData):
         self.USER_ID = USER_ID
         self.TASK_CONDITION = TASK_CONDITION
 
-        self.DIRNAME_SIMULATION = DIRNAME_SIMULATION
+        self.DIRNAME_SIMULATION = os.path.abspath(DIRNAME_SIMULATION)
 
         self.FILENAME_STUDY_TARGETPOSITIONS = FILENAME_STUDY_TARGETPOSITIONS
         self.SIMULATION_SUBDIR = SIMULATION_SUBDIR
@@ -1733,15 +1735,15 @@ class TrajectoryData_MPC(TrajectoryData):
         super().__init__()
 
         self.data = pd.read_csv(os.path.join(self.DIRNAME_SIMULATION,
-            f'{USER_ID}/{SIMULATION_SUBDIR}/{TASK_CONDITION}/complete.csv'))
+                                             f'{USER_ID}/{SIMULATION_SUBDIR}/{TASK_CONDITION}/complete.csv'))
         # TODO: self.data_action = ?
 
     def preprocess(self):
 
         # load indices of individual trials (timesteps at which new target was visible for the first time)
         self._indices = np.load(os.path.join(self.DIRNAME_SIMULATION,
-            f'{self.USER_ID}/{self.SIMULATION_SUBDIR}/{self.TASK_CONDITION}/SubMovIndices.npy'),
-            allow_pickle=True)
+                                             f'{self.USER_ID}/{self.SIMULATION_SUBDIR}/{self.TASK_CONDITION}/SubMovIndices.npy'),
+                                allow_pickle=True)
 
         self._position_series = self.data.loc[:, [f"end-effector_xpos_{xyz}" for xyz in ("x", "y", "z")]].values
         self._velocity_series = self.data.loc[:, [f"end-effector_xvel_{xyz}" for xyz in ("x", "y", "z")]].values
@@ -1780,7 +1782,8 @@ class TrajectoryData_MPC(TrajectoryData):
 
         self.preprocessed = True
 
-    def compute_indices(self, TARGET_IDS=None, TRIAL_IDS=None, META_IDS=None, N_MOVS=None, AGGREGATION_VARS=[], ignore_trainingset_trials=False):
+    def compute_indices(self, TARGET_IDS=None, TRIAL_IDS=None, META_IDS=None, N_MOVS=None, AGGREGATION_VARS=[],
+                        ignore_trainingset_trials=False):
         self.TARGET_IDS = TARGET_IDS  # Target ID [second-last column of self.indices]; if None: use TRIAL_IDS
         self.TRIAL_IDS = TRIAL_IDS  # Trial ID [last column of self.indices]; if None: use META_IDS
         self.META_IDS = META_IDS  # index positions (i.e., sequential numbering of trials in indices, without counting removed outliers); if None: use N_MOVS
@@ -1821,77 +1824,77 @@ class TrajectoryData_MPC(TrajectoryData):
                     self.selected_movements_indices = [list(
                         zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                             self._indices[direction_meta_indices, 1])) for target_idx in self.TARGET_IDS if
-                                                       len(direction_meta_indices := np.where(
-                                                           (self._indices[:, 3] == target_idx) & np.isin(
-                                                               self.indices[:, 4], self.TRIAL_IDS))[0]) > 0 if
-                                                       len(direction_meta_indices_before := np.where((self._indices[:,
-                                                                                                      3] == (
-                                                                                                                  target_idx - 1) % self.STUDY_DIRECTION_NUMS) & np.isin(
-                                                           self.indices[:, 4], self.TRIAL_IDS))[0]) > 0]
+                        len(direction_meta_indices := np.where(
+                            (self._indices[:, 3] == target_idx) & np.isin(
+                                self.indices[:, 4], self.TRIAL_IDS))[0]) > 0 if
+                        len(direction_meta_indices_before := np.where((self._indices[:,
+                                                                       3] == (
+                                                                               target_idx - 1) % self.STUDY_DIRECTION_NUMS) & np.isin(
+                            self.indices[:, 4], self.TRIAL_IDS))[0]) > 0]
                 else:
                     self.selected_movements_indices = [list(
                         zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                             self._indices[direction_meta_indices, 1])) for target_idx in self.TARGET_IDS if
-                                                       len(direction_meta_indices :=
-                                                           np.where((self._indices[:, 3] == target_idx))[0]) > 0 if
-                                                       len(direction_meta_indices_before := np.where((self._indices[:,
-                                                                                                      3] == (
-                                                                                                                  target_idx - 1) % self.MPC_DIRECTION_NUMS))[
-                                                           0]) > 0]
+                        len(direction_meta_indices :=
+                            np.where((self._indices[:, 3] == target_idx))[0]) > 0 if
+                        len(direction_meta_indices_before := np.where((self._indices[:,
+                                                                       3] == (
+                                                                               target_idx - 1) % self.MPC_DIRECTION_NUMS))[
+                            0]) > 0]
                 # pass #this if-condition can be removed, as it was only added to ensure consistency with TrajectoriesData_RL
             elif self.TRIAL_IDS is not None:
                 self.selected_movements_indices = [list(
                     zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                         self._indices[direction_meta_indices, 1])) for target_idx in
-                                                   list(range(1, self.MPC_DIRECTION_NUMS)) + [0] if
-                                                   len(direction_meta_indices := np.where(
-                                                       (self._indices[:, 3] == target_idx) & (
-                                                           np.isin(self.indices[:, 4], self.TRIAL_IDS)))[0]) > 0 if
-                                                   len(direction_meta_indices_before := np.where((self._indices[:,
-                                                                                                  3] == (
-                                                                                                              target_idx - 1) % self.MPC_DIRECTION_NUMS))[
-                                                       0]) > 0]
+                    list(range(1, self.MPC_DIRECTION_NUMS)) + [0] if
+                    len(direction_meta_indices := np.where(
+                        (self._indices[:, 3] == target_idx) & (
+                            np.isin(self.indices[:, 4], self.TRIAL_IDS)))[0]) > 0 if
+                    len(direction_meta_indices_before := np.where((self._indices[:,
+                                                                   3] == (
+                                                                           target_idx - 1) % self.MPC_DIRECTION_NUMS))[
+                        0]) > 0]
             elif self.META_IDS is not None:
                 self.selected_movements_indices = [list(
                     zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                         self._indices[direction_meta_indices, 1])) for target_idx in
-                                                   list(range(1, self.MPC_DIRECTION_NUMS)) + [0] if
-                                                   len(direction_meta_indices := np.where(
-                                                       (self._indices[:, 3] == target_idx) & (
-                                                           np.isin(np.arange(len(self._indices)), self.META_IDS)))[
-                                                       0]) > 0 if len(direction_meta_indices_before := np.where(
+                    list(range(1, self.MPC_DIRECTION_NUMS)) + [0] if
+                    len(direction_meta_indices := np.where(
+                        (self._indices[:, 3] == target_idx) & (
+                            np.isin(np.arange(len(self._indices)), self.META_IDS)))[
+                        0]) > 0 if len(direction_meta_indices_before := np.where(
                         (self._indices[:, 3] == (target_idx - 1) % self.MPC_DIRECTION_NUMS))[0]) > 0]
             elif self.N_MOVS is not None:
                 self.selected_movements_indices = [list(
                     zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                         self._indices[direction_meta_indices, 1])) for target_idx in
-                                                   list(range(1, self.MPC_DIRECTION_NUMS)) + [0] if
-                                                   len(direction_meta_indices := np.where(
-                                                       (self._indices[:, 3] == target_idx) & (
-                                                           np.isin(np.arange(len(self._indices)),
-                                                                   np.arange(self.N_MOVS))))[0]) > 0 if
-                                                   len(direction_meta_indices_before := np.where((self._indices[:,
-                                                                                                  3] == (
-                                                                                                              target_idx - 1) % self.MPC_DIRECTION_NUMS))[
-                                                       0]) > 0]
+                    list(range(1, self.MPC_DIRECTION_NUMS)) + [0] if
+                    len(direction_meta_indices := np.where(
+                        (self._indices[:, 3] == target_idx) & (
+                            np.isin(np.arange(len(self._indices)),
+                                    np.arange(self.N_MOVS))))[0]) > 0 if
+                    len(direction_meta_indices_before := np.where((self._indices[:,
+                                                                   3] == (
+                                                                           target_idx - 1) % self.MPC_DIRECTION_NUMS))[
+                        0]) > 0]
             else:
                 self.selected_movements_indices = [list(
                     zip(self._indices[direction_meta_indices_before, 0], self._indices[direction_meta_indices, 0],
                         self._indices[direction_meta_indices, 1])) for target_idx in
-                                                   list(range(1, self.MPC_DIRECTION_NUMS)) + [0] if
-                                                   len(direction_meta_indices :=
-                                                       np.where((self._indices[:, 3] == target_idx))[0]) > 0 if
-                                                   len(direction_meta_indices_before := np.where((self._indices[:,
-                                                                                                  3] == (
-                                                                                                              target_idx - 1) % self.MPC_DIRECTION_NUMS))[
-                                                       0]) > 0]
+                    list(range(1, self.MPC_DIRECTION_NUMS)) + [0] if
+                    len(direction_meta_indices :=
+                        np.where((self._indices[:, 3] == target_idx))[0]) > 0 if
+                    len(direction_meta_indices_before := np.where((self._indices[:,
+                                                                   3] == (
+                                                                           target_idx - 1) % self.MPC_DIRECTION_NUMS))[
+                        0]) > 0]
                 assert len(self.selected_movements_indices) == self.MPC_DIRECTION_NUMS
 
                 # concatenate last_idx, current_idx, and next_idx for all selected trials (TARGET_IDS is used afterwards):
             self.selected_movements_indices = [tuple(
                 [selected_movements_indices_direction_trial[j] for selected_movements_indices_direction_trial in
                  selected_movements_indices_direction] for j in range(3)) for selected_movements_indices_direction in
-                                               self.selected_movements_indices]
+                self.selected_movements_indices]
 
         else:
             ##self.selected_movements_indices = list(zip(np.hstack(([self._indices[self.trials_to_current_init_pos[0], 0]], self._indices[:-1, 0])), self._indices[:, 0], self._indices[:, 1]))
@@ -1908,14 +1911,18 @@ class TrajectoryData_MPC(TrajectoryData):
                 # Remove trials with initial position never reached (NOTE: if it is ensured, that effective_projection_path==True is used later, these trials do not need to be removed and the first column ("last_idx")) can be set arbitrarily...):
                 closest_meta_indices_processed = [i for i in closest_meta_indices if not np.isnan(i)]
                 if len(closest_meta_indices_processed) < len(closest_meta_indices):
-                    logging.error(f"MPC ({self.USER_ID}, {self.TASK_CONDITION}, {self.SIMULATION_SUBDIR}) - Removed trials with Trial ID {self.indices[np.where(np.isnan(closest_meta_indices))[0], 4]}, since no movement to initial position (Target(s) {np.unique(self.indices[np.where(np.isnan(closest_meta_indices))[0], 2])}) could be identified.")
-                indices_of_trials_to_current_init_position = np.hstack(([self.indices[closest_meta_indices_processed, 0]]))
+                    logging.error(
+                        f"MPC ({self.USER_ID}, {self.TASK_CONDITION}, {self.SIMULATION_SUBDIR}) - Removed trials with Trial ID {self.indices[np.where(np.isnan(closest_meta_indices))[0], 4]}, since no movement to initial position (Target(s) {np.unique(self.indices[np.where(np.isnan(closest_meta_indices))[0], 2])}) could be identified.")
+                indices_of_trials_to_current_init_position = np.hstack(
+                    ([self.indices[closest_meta_indices_processed, 0]]))
                 assert len(closest_meta_indices) == len(self._indices)
                 self._indices = self.indices[np.where(~np.isnan(closest_meta_indices))[0], :]
             else:
                 ### VARIANT 2 (dirty hack (TODO: this definitely needs code clean up!) - directly store target ID with negative sign (and shifted by -100) instead of frame ID in indices_of_trials_to_current_init_position and thus in first column of self.selected_movements_indices, if no movement to the respective init position exists)
                 closest_meta_indices_processed = closest_meta_indices
-                indices_of_trials_to_current_init_position = np.hstack(([self.indices[i, 0] if not np.isnan(i) else -100-self.indices[idx, 2] for idx, i in enumerate(closest_meta_indices_processed)]))  #closest_meta_indices_processed should have same length as self._indices here by definition
+                indices_of_trials_to_current_init_position = np.hstack(([
+                    self.indices[i, 0] if not np.isnan(i) else -100 - self.indices[idx, 2] for idx, i in enumerate(
+                        closest_meta_indices_processed)]))  # closest_meta_indices_processed should have same length as self._indices here by definition
             #####################
             assert len(closest_meta_indices_processed) == len(self._indices)
             self.trials_to_current_init_pos = np.where(self._indices[1:, 3] == self._indices[0, 2])[0] + 1
@@ -1933,7 +1940,7 @@ class TrajectoryData_MPC(TrajectoryData):
                 self.selected_movements_indices = [self.selected_movements_indices[i] for i in
                                                    range(len(self.selected_movements_indices)) if
                                                    i not in trainingset_META_IDS]
-                logging.warning(
+                logging.info(
                     f"MPC ({self.USER_ID}, {self.TASK_CONDITION}, {self.SIMULATION_SUBDIR}) - Ignore training set indices {trainingset_TRIAL_IDS}.")
 
             if self.TARGET_IDS is not None:  # self.TARGET_IDS consists of Target IDs (0, ..., self.MPC_DIRECTION_NUMS - 1)
@@ -1969,11 +1976,12 @@ class TrajectoryData_MPC(TrajectoryData):
             target_position_series = self._target_position_series  # [0] if self.AGGREGATE_TRIALS else self._target_position_series
             if not ignore_trainingset_trials:
                 assert len(np.unique(np.round(target_position_series[self._indices[self.trials_to_current_init_pos, 0]],
-                                          decimals=12))) == 3, f"ERROR: Target positions do not match for trials with same init/target id!"
+                                              decimals=12))) == 3, f"ERROR: Target positions do not match for trials with same init/target id!"
             # self.selected_movements_indices_per_trial = list(zip(np.hstack(([self._indices[self.trials_to_current_init_pos[0], 0]], self._indices[:-1, 0])), self._indices[:, 0], self._indices[:, 1]))
             ### VARIANT 1:  #FLAG123
             if self.FILENAME_STUDY_TARGETPOSITIONS is None:
-                self.target_positions_per_trial = target_position_series[np.squeeze(self.selected_movements_indices)[..., :2], :]
+                self.target_positions_per_trial = target_position_series[
+                                                  np.squeeze(self.selected_movements_indices)[..., :2], :]
             ### VARIANT 2:
             else:
                 self.target_positions_per_trial = np.array([target_position_series[i, :] if i[0] >= 0 else [
@@ -2257,4 +2265,3 @@ def minimumjerk_deterministic(N, T, initialuservalues, dim, P, dt, x0, final_vel
     u = None  # [T[0][1*dim:]] * (N_minjerk + 1)
 
     return x, u
-

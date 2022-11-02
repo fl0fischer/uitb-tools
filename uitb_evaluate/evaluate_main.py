@@ -1,19 +1,21 @@
 import numpy as np
+from scipy import stats
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes, InsetPosition
+import pickle
 import logging
 import io, os
-from uitb_evaluate.trajectory_data import *
+from uitb_evaluate.trajectory_data import PLOTS_DIR_DEFAULT, INDEPENDENT_JOINTS, \
+    TrajectoryData_MPC, TrajectoryData_MultipleInstances
 
 def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
                    common_simulation_subdir, filename, trajectories_SIMULATION,
                    trajectories_STUDY=None,
                    trajectories_USERS=None,
-                   independent_joints=INDEPENDENT_JOINTS, actuator_names=ACTUATOR_NAMES,
-                   actuator_names_dict=ACTUATOR_NAMES_DICT,
+                   independent_joints=INDEPENDENT_JOINTS,
                    REPEATED_MOVEMENTS=False,
                    USER_ID_FIXED="<unknown-user>",
                    ignore_trainingset_trials_mpc_userstudy=True,  #only used if PLOTTING_ENV.startswith("MPC-userstudy")
@@ -122,11 +124,11 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
 
     for axis in endeffector_ax:
         axis.clear()
-    if "cbaxes" in locals():  # inset_axes
-        try:
-            cbaxes.remove()
-        except ValueError:
-            pass
+    # if "cbaxes" in locals():  # inset_axes
+    #     try:
+    #         cbaxes.remove()
+    #     except ValueError:
+    #         pass
     endeffector_fig.subplots_adjust(left=0.1, right=0.95, bottom=0.2, top=0.9, wspace=0.26, hspace=0.2)
 
 
@@ -178,7 +180,7 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
     _plot_MOVEMENT_ID = f"M{pprint_range_or_intlist(MOVEMENT_IDS)}_" if MOVEMENT_IDS is not None else ""
     _plot_RADIUS_ID = f"R{pprint_range_or_intlist(RADIUS_IDS)}_" if RADIUS_IDS is not None else ""
 
-    _plot_r1_FIXED = f"r_{float(r1_FIXED):.8e}_" if r1_FIXED is not None else ""  #only used if PLOTTING_ENV == "MPC-costweights"
+    _plot_r1_FIXED = f"r1_{float(r1_FIXED):.8e}_" if r1_FIXED is not None else ""  #only used if PLOTTING_ENV == "MPC-costweights"
     _plot_r2_FIXED = f"r2_{float(r2_FIXED):.8e}_" if r2_FIXED is not None else ""  #only used if PLOTTING_ENV == "MPC-costweights"
 
     _plot_JOINT_ID = "EE_" if PLOT_ENDEFFECTOR else f"{independent_joints[JOINT_ID]}_"
@@ -262,7 +264,7 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
         assert SHOW_STUDY == False, "Did not prepare user study data for this case."
         trajectories_WEIGHTS_selected = trajectories_SIMULATION.copy()
         if r1_FIXED is not None:
-            trajectories_WEIGHTS_selected = [i for i in trajectories_WEIGHTS_selected if f"r_{float(r1_FIXED):.8e}" in i.SIMULATION_SUBDIR]
+            trajectories_WEIGHTS_selected = [i for i in trajectories_WEIGHTS_selected if f"r1_{float(r1_FIXED):.8e}" in i.SIMULATION_SUBDIR]
         if r2_FIXED is not None:
             trajectories_WEIGHTS_selected = [i for i in trajectories_WEIGHTS_selected if f"r2_{float(r2_FIXED):.8e}" in i.SIMULATION_SUBDIR]
         for trajectories in trajectories_WEIGHTS_selected:
@@ -617,10 +619,6 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
         endeffector_ax[0].set_ylim(predefined_ylim)
         endeffector_ax[1].set_ylim(predefined_ylim)
 
-    # if REPEATED_MOVEMENTS:
-    #     endeffector_fig.savefig(f"plots/{filename}/proj_{trajectories_SIMULATION.data_key}.png", dpi=120)
-    # else:
-    #     endeffector_fig.savefig(f"plots/{filename}/proj_movements_vs_minjerk.png", dpi=120)
     if STORE_PLOT:
         if STORE_AXES_SEPARATELY:
             for ax_idx_keep in range(len(endeffector_fig.axes[:len(endeffector_ax)])):
@@ -643,20 +641,19 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
                 fig_hlp.set_figwidth(4.5)
                 fig_hlp.subplots_adjust(left=0.2 + 0*(0.03 if ax_idx_keep==1 else 0), right=0.95, bottom=0.2, top=0.88, wspace=0.2, hspace=0.2)
                 if ax_idx_keep == 0 and len(fig_hlp.axes) > 1:
-                    from mpl_toolkits.axes_grid1.inset_locator import InsetPosition
                     fig_hlp.axes[-1].set_axes_locator(InsetPosition(fig_hlp.axes[0], [0.75 if r1_FIXED is None else 0.675, 0.1 if r1_FIXED is None else 0.1, 0.03, 0.6]))  #(460 if r1_FIXED is None else 430, 40 if r1_FIXED is None else 30, 200, 300)))
 
                 _filename = os.path.join(PLOTS_DIR, f"{plot_filename_ID_extended}.png")
                 if not os.path.exists(os.path.dirname(_filename)):
                     os.makedirs(os.path.dirname(_filename))
-                fig_hlp.savefig(_filename, dpi=300)
+                fig_hlp.savefig(_filename, bbox_inches='tight', dpi=300)
 
                 plt.close(fig_hlp)
         else:
             _filename = os.path.join(PLOTS_DIR, f"{plot_filename_ID}.png")
             if not os.path.exists(os.path.dirname(_filename)):
                 os.makedirs(os.path.dirname(_filename))
-            endeffector_fig.savefig(_filename, dpi=300)
+            endeffector_fig.savefig(_filename, bbox_inches='tight', dpi=300)
     else:
         if STORE_AXES_SEPARATELY:
             for ax_idx_keep in range(len(endeffector_ax)):

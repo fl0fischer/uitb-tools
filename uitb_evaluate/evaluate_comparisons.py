@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from statannot import add_stat_annotation
 import os, logging
-from uitb_evaluate.trajectory_data import *
+import itertools
+from uitb_evaluate.trajectory_data import PLOTS_DIR_DEFAULT
 
 def quantitativecomparisonplot(PLOTTING_ENV_COMPARISON, QUANTITY, res_dict,
                                SIMULATION_SUBDIR_LIST,
@@ -14,20 +15,24 @@ def quantitativecomparisonplot(PLOTTING_ENV_COMPARISON, QUANTITY, res_dict,
                                USER2USER_FIXED=False,
                                USER2USER=False,
                                SIM2USER_PER_USER=False,
+                               USER_ID_LIST=["U1", "U2", "U3", "U4", "U5", "U6"],
                                USER_ID_FIXED="<unknown-user>",
                                COLOR_PALETTE="turbo",
                                ENABLE_LEGEND=True,
                                STORE_PLOT=False, PLOTS_DIR=PLOTS_DIR_DEFAULT):
 
-    # common_simulation_subdir = "".join([i for i,j,k in zip(*SIMULATION_SUBDIR_LIST) if i==j==k])
-    # if common_simulation_subdir[-1] in ["-", "_"]:
-    #     common_simulation_subdir = common_simulation_subdir[:-1]
-    # _plot_SIMULATION_SUBDIR_LIST = common_simulation_subdir
-    _plot_SIMULATION_SUBDIR_LIST = "__".join(SIMULATION_SUBDIR_LIST)
+    if len(SIMULATION_SUBDIR_LIST) > 1:
+        common_simulation_subdir = "".join([i for i, j, k in zip(*SIMULATION_SUBDIR_LIST) if i == j == k])
+        if len(common_simulation_subdir) == 0:
+            common_simulation_subdir = "ALLCOSTS"
+        elif common_simulation_subdir[-1] in ["-", "_"]:
+            common_simulation_subdir = common_simulation_subdir[:-1]
+        _plot_SIMULATION_SUBDIR_LIST = common_simulation_subdir
+    else:
+        _plot_SIMULATION_SUBDIR_LIST = "__".join(SIMULATION_SUBDIR_LIST)
     _plot_TASK_CONDITION_LIST = "__".join(TASK_CONDITION_LIST)
 
-    quantitative_comparison_fig = plt.figure(figsize=[4.5, 3])
-    #quantitative_comparison_fig = plt.figure(figsize=[13.5, 3]) #if SIM2USER_PER_USER == True
+    quantitative_comparison_fig = plt.figure(figsize=[13.5, 3] if SIM2USER_PER_USER else [4.5, 3])
     quantitative_comparison_ax = quantitative_comparison_fig.gca()
 
     quantitative_comparison_ax.clear()
