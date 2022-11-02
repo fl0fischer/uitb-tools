@@ -590,15 +590,14 @@ class TrajectoryData_RL(TrajectoryData):
         self.REPEATED_MOVEMENTS = REPEATED_MOVEMENTS  # if True, combine individual log files into one data structure
 
         if independent_joints is None:
-            self.independent_joints = [  # 'eye-rx',
-                # 'eye-ry',
+            self.independent_joints = [
                 'elv_angle',
                 'shoulder_elv',
                 'shoulder_rot',
                 'elbow_flexion',
                 'pro_sup',
-                'deviation',
-                'flexion'
+                # 'deviation',
+                # 'flexion'
             ]
         else:
             self.independent_joints = independent_joints
@@ -1037,8 +1036,11 @@ class TrajectoryData_RL(TrajectoryData):
 
         return self._indices
 
-    def compute_indices(self, TARGET_IDS=None, TRIAL_IDS=None, META_IDS=None, N_MOVS=None, AGGREGATION_VARS=[]):
+    def compute_indices(self, TARGET_IDS=None, TRIAL_IDS=None, META_IDS=None, N_MOVS=None, AGGREGATION_VARS=[],
+                        ignore_trainingset_trials=False):
         # INFO: AGGREGATION_VARS includes variables, which are neglected when aggregating different trials to some "movement distribution" (e.g., "episode" aggregates trials independent of the episode, "targetoccurrence" aggregates trials with the same(!) target ID within an episode (more accurately, within the respective row of self._indices))
+
+        assert not ignore_trainingset_trials, "'ignore_trainingset_trials' must not be True for instances of TrajectoryData_RL."
 
         if self.REPEATED_MOVEMENTS:
             assert set(AGGREGATION_VARS).issubset({"episode", "radius", "movement", "target",
@@ -1210,8 +1212,7 @@ class TrajectoryData_STUDY(TrajectoryData):
         self.FILENAME_STUDY_TARGETPOSITIONS = FILENAME_STUDY_TARGETPOSITIONS
 
         if independent_joints is None:
-            self.independent_joints = [  # 'eye-rx',
-                # 'eye-ry',
+            self.independent_joints = [
                 'elv_angle',
                 'shoulder_elv',
                 'shoulder_rot',
@@ -1687,8 +1688,7 @@ class TrajectoryData_MPC(TrajectoryData):
         self.SIMULATION_SUBDIR = SIMULATION_SUBDIR
 
         if independent_joints is None:
-            self.independent_joints = [  # 'eye-rx',
-                # 'eye-ry',
+            self.independent_joints = [
                 'elv_angle',
                 'shoulder_elv',
                 'shoulder_rot',

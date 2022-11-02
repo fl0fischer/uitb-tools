@@ -14,7 +14,7 @@ from uitb_evaluate.trajectory_data import PLOTS_DIR_DEFAULT, INDEPENDENT_JOINTS,
 def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
                    common_simulation_subdir, filename, trajectories_SIMULATION,
                    trajectories_STUDY=None,
-                   trajectories_USERS=None,
+                   trajectories_SUPPLEMENTARY=None,
                    independent_joints=INDEPENDENT_JOINTS,
                    REPEATED_MOVEMENTS=False,
                    USER_ID_FIXED="<unknown-user>",
@@ -31,6 +31,7 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
                    SHOW_MINJERK=False, SHOW_STUDY=False, STUDY_ONLY=False,
                    ENABLE_LEGENDS_AND_COLORBARS=True, ALLOW_DUPLICATES_BETWEEN_LEGENDS=False,
                    predefined_ylim=None,
+                   plot_width="thirdpage",
                    STORE_PLOT=False, STORE_AXES_SEPARATELY=True, PLOTS_DIR=PLOTS_DIR_DEFAULT):
 
     # # WHICH PARTS OF DATASET? #only used if PLOTTING_ENV == "RL-UIB"
@@ -94,28 +95,31 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
     #
     # ####
 
-    # for 0.33\linewidth or 0.25\linewidth plots (one-column format):
-    params = {'figure.titlesize': 16,  # Fontsize of the figure title
-              'axes.titlesize': 16,  # Fontsize of the axes title
-              'axes.labelsize': 14,  # Fontsize of the x and y labels
-              'xtick.labelsize': 14,  # Fontsize of the xtick labels
-              'ytick.labelsize': 14,  # Fontsize of the ytick labels
-              'legend.fontsize': 12,  # Fontsize of the legend entries
-              'legend.title_fontsize': 12,  # Fontsize of the legend title
-              # 'font.size': 12  #Default fontsize
-              }
-    # # for 0.5\linewidth plots (one-column format):
-    # params = {'figure.titlesize': 12, #Fontsize of the figure title
-    #           'axes.titlesize': 12, #Fontsize of the axes title
-    #           'axes.labelsize': 10, #Fontsize of the x and y labels
-    #           'xtick.labelsize': 10, #Fontsize of the xtick labels
-    #           'ytick.labelsize': 10, #Fontsize of the ytick labels
-    #           'legend.fontsize': 9, #Fontsize of the legend entries
-    #           'legend.title_fontsize': 9, #Fontsize of the legend title
-    #           #'font.size': 12  #Default fontsize
-    #          }
+    if plot_width == "thirdpage":
+        # for 0.33\linewidth or 0.25\linewidth plots (one-column format):
+        params = {'figure.titlesize': 16,  # Fontsize of the figure title
+                  'axes.titlesize': 16,  # Fontsize of the axes title
+                  'axes.labelsize': 14,  # Fontsize of the x and y labels
+                  'xtick.labelsize': 14,  # Fontsize of the xtick labels
+                  'ytick.labelsize': 14,  # Fontsize of the ytick labels
+                  'legend.fontsize': 12,  # Fontsize of the legend entries
+                  'legend.title_fontsize': 12,  # Fontsize of the legend title
+                  # 'font.size': 12  #Default fontsize
+                  }
+    elif plot_width == "halfpage":
+        # for 0.5\linewidth plots (one-column format):
+        params = {'figure.titlesize': 12, #Fontsize of the figure title
+                  'axes.titlesize': 12, #Fontsize of the axes title
+                  'axes.labelsize': 10, #Fontsize of the x and y labels
+                  'xtick.labelsize': 10, #Fontsize of the xtick labels
+                  'ytick.labelsize': 10, #Fontsize of the ytick labels
+                  'legend.fontsize': 9, #Fontsize of the legend entries
+                  'legend.title_fontsize': 9, #Fontsize of the legend title
+                  #'font.size': 12  #Default fontsize
+                 }
+    else:
+        params = {}
     plt.rcParams.update(params)
-    #logging.warning(f"Any changes in rcParams might require to re-create figures!")
 
     # plt.rcParams.update(plt.rcParamsDefault)
 
@@ -218,20 +222,20 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
         ## RL
         if filename.endswith("max-freq-"):  #speed comparison (usually used for TrackingEnv)
             trajectories_info = []
-            for i, trajectories in enumerate(trajectories_SPEEDS):
+            for i, trajectories in enumerate(trajectories_SIMULATION):
                 trajectories.preprocess(MOVEMENT_IDS=MOVEMENT_IDS, RADIUS_IDS=RADIUS_IDS, EPISODE_IDS=EPISODE_IDS, split_trials="tracking" not in filename and "driving" not in filename)
                 trajectories.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS, N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS)
                 trajectories.SHOW_MINJERK = False
-                trajectories_info.append((trajectories, {'linestyle': '-', 'label': 'Simulation', 'color': matplotlib.cm.get_cmap('nipy_spectral')(i/len(trajectories_SPEEDS))}, {'alpha': 0.2}, ""))
+                trajectories_info.append((trajectories, {'linestyle': '-', 'label': 'Simulation', 'color': matplotlib.cm.get_cmap('nipy_spectral')(i/len(trajectories_SIMULATION))}, {'alpha': 0.2}, ""))
         elif "driving" in filename:  #RemoteDrivingEnv
             trajectories_SIMULATION.preprocess(MOVEMENT_IDS=MOVEMENT_IDS, RADIUS_IDS=RADIUS_IDS, EPISODE_IDS=EPISODE_IDS, split_trials=False, endeffector_name="car")
             trajectories_SIMULATION.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS, N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS)
             trajectories_SIMULATION.SHOW_MINJERK = False
 
-            trajectories_SIMULATION_JOYSTICK.preprocess(MOVEMENT_IDS=MOVEMENT_IDS, RADIUS_IDS=RADIUS_IDS, EPISODE_IDS=EPISODE_IDS, split_trials=False, endeffector_name="fingertip", target_name="joystick")
-            trajectories_SIMULATION_JOYSTICK.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS, N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS)
-            trajectories_SIMULATION_JOYSTICK.SHOW_MINJERK = False
-            trajectories_info = [(trajectories_SIMULATION_JOYSTICK, {'linestyle': '-', 'label': 'Fingertip', 'color': matplotlib.cm.get_cmap('nipy_spectral')(0.4)}, {'alpha': 0.2}, ""),
+            trajectories_SUPPLEMENTARY.preprocess(MOVEMENT_IDS=MOVEMENT_IDS, RADIUS_IDS=RADIUS_IDS, EPISODE_IDS=EPISODE_IDS, split_trials=False, endeffector_name="fingertip", target_name="joystick")
+            trajectories_SUPPLEMENTARY.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS, N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS)
+            trajectories_SUPPLEMENTARY.SHOW_MINJERK = False
+            trajectories_info = [(trajectories_SUPPLEMENTARY, {'linestyle': '-', 'label': 'Fingertip', 'color': matplotlib.cm.get_cmap('nipy_spectral')(0.4)}, {'alpha': 0.2}, ""),
                                 (trajectories_SIMULATION, {'linestyle': '-', 'label': 'Car', 'color': matplotlib.cm.get_cmap('nipy_spectral')(0.9)}, {'alpha': 0.2}, ""),
                                 ]  #contains tuples consisting of 1. a TrajectoryData instance, 2. a dict with plotting kwargs for regular (line) plots, 3. a dict with plotting kwargs for "fill_between" plots, and 4. a code string to execute at the beginning
         else:
@@ -243,11 +247,11 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
             trajectories_STUDY.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS, N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS_STUDY)
             trajectories_info.append((trajectories_STUDY, {'linestyle': '--', 'label': 'Human', 'target_cmap': 'nipy_spectral'}, {'alpha': 0.2}, ""))
 
-            # OPTIONAL: show all users (between-user comparison)
-            for trajectories in trajectories_STUDY_OTHERS:
-                trajectories.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS, N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS_STUDY)
-    #            trajectories_info.append((trajectories, {'linestyle': ':', 'label': 'Other Users', 'color': matplotlib.cm.get_cmap('turbo')(0.2), 'alpha': 0.6}, {'alpha': 0.2}, ""))
-                trajectories_info.append((trajectories, {'linestyle': ':', 'label': 'Other Users', 'target_cmap': 'nipy_spectral', 'alpha': 0.4}, {'alpha': 0.2}, ""))
+    #         # OPTIONAL: show all users (between-user comparison)
+    #         for trajectories in trajectories_SUPPLEMENTARY:
+    #             trajectories.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS, N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS_STUDY)
+    # #            trajectories_info.append((trajectories, {'linestyle': ':', 'label': 'Other Users', 'color': matplotlib.cm.get_cmap('turbo')(0.2), 'alpha': 0.6}, {'alpha': 0.2}, ""))
+    #             trajectories_info.append((trajectories, {'linestyle': ':', 'label': 'Other Users', 'target_cmap': 'nipy_spectral', 'alpha': 0.4}, {'alpha': 0.2}, ""))
     elif PLOTTING_ENV == "MPC-costs":
         ## MPC - Comparison of cost functions
         trajectories_SIMULATION1, trajectories_SIMULATION2, trajectories_SIMULATION3 = trajectories_SIMULATION
@@ -297,7 +301,7 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
             map_task_conditions = lambda x: " ".join(["Virtual Pad" if "_Pad_" in x else "Virtual Cursor", "ID" if "_ID_" in x else "Erg." if "_Handtuned_" in x else "???"])
             trajectories_info = [(trajectories, {'linestyle': '-', 'label': map_task_conditions(trajectories.TASK_CONDITION), 'color': matplotlib.cm.get_cmap('turbo')((i+1)/(len(trajectories_CONDITIONS_selected)+3)), 'alpha': 0.8}, {'alpha': 0.2}, "") for i, trajectories in enumerate(trajectories_CONDITIONS_selected)]
         if SHOW_STUDY:
-            trajectories_USERS_selected = trajectories_USERS.copy()
+            trajectories_USERS_selected = trajectories_SUPPLEMENTARY.copy()
             #trajectories_USERS_selected = [i for i in trajectories_USERS_selected if i.TASK_CONDITION in TASK_CONDITION_LIST_SELECTED]
             for i, trajectories in enumerate(trajectories_USERS_selected):
                 trajectories.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS, N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS_STUDY, ignore_trainingset_trials=True)
@@ -313,13 +317,13 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
             else:  #within-user comparison
                 trajectories_info.append((trajectories_STUDY, {'linestyle': '--', 'label': f'Study', 'color': 'black'}, {'alpha': 0.2}, ""))
         if PLOTTING_ENV == "MPC-userstudy":
-            for trajectories in [i for i in trajectories_USERS if i.USER_ID != USER_ID_FIXED]:
+            for trajectories in [i for i in trajectories_SUPPLEMENTARY if i.USER_ID != USER_ID_FIXED]:
                 trajectories.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS,
                                              N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS_STUDY,
                                              ignore_trainingset_trials=ignore_trainingset_trials_mpc_userstudy)  # STUDY
 
             if TARGET_IDS is None:  #between-user comparison
-                trajectories_info.extend([(trajectories, {'linestyle': ':', 'label': 'Other Users', 'color': matplotlib.cm.get_cmap('turbo')(0.2), 'alpha': 0.8}, {'alpha': 0.2}, "") for i, trajectories in enumerate(trajectories_USERS) if trajectories.USER_ID != USER_ID_FIXED])
+                trajectories_info.extend([(trajectories, {'linestyle': ':', 'label': 'Other Users', 'color': matplotlib.cm.get_cmap('turbo')(0.2), 'alpha': 0.8}, {'alpha': 0.2}, "") for i, trajectories in enumerate(trajectories_SUPPLEMENTARY) if trajectories.USER_ID != USER_ID_FIXED])
     elif PLOTTING_ENV == "MPC-betweenuser":
         ## MPC - Between-user comparisons: A simulation class incorporating different users vs. a study class incorporating different users
         trajectories_SIMULATION.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS, N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS, ignore_trainingset_trials=True)  #MPC
@@ -584,7 +588,7 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
         legend_handles = methods_handles+handles
 
     if len(legend_handles) > 0:
-        endeffector_ax[0].legend(handles=legend_handles, ncol=(len(trajectories_SPEEDS) + 2)//2 if (PLOTTING_ENV == "RL-UIB") and filename.endswith("max-freq-") else 2 if "driving" in filename and PLOTTING_ENV == "RL-UIB" else 1)
+        endeffector_ax[0].legend(handles=legend_handles, ncol=(len(trajectories_SIMULATION) + 2)//2 if (PLOTTING_ENV == "RL-UIB") and filename.endswith("max-freq-") else 2 if "driving" in filename and PLOTTING_ENV == "RL-UIB" else 1)
 
     # remove axis 0 legend (and colorbars) completely
     if not ENABLE_LEGENDS_AND_COLORBARS:

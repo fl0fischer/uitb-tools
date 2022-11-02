@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.signal import savgol_filter
 import os
 
-# -> creates complete.csv files required for TrajectoryData_MPC instances (adapted from plots_markus.ipynb)
+# -> creates complete.csv files required for TrajectoryData_MPC instances
 def preprocess_movement_data_simulation(simulation_dirname, study_dirname, participant, task_condition, user_initial_delay=0.5, start_outside_target=False, initial_acceleration_constraint=0, scale_movement_times=True, scale_to_mean_movement_times=True, simulation_subdir="sim_wt20"):
 
     simulation_dirname = os.path.abspath(simulation_dirname)
