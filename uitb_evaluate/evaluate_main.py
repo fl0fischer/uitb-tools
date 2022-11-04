@@ -208,7 +208,7 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
         plot_filename_ID = f"MPC/{common_simulation_subdir}/{USER_ID}/{TASK_CONDITION}/{_plot_JOINT_ID}{_plot_DEVIATION}{_plot_PHASESPACE}{_plot_VEL_ACC}{_plot_TARGET_ID}{_plot_METATRIAL_ID}{_plot_AGGREGATE}{_plot_RANGE}{_plot_EFFECTIVE_PROJECTION_PATH}{_plot_USE_TARGETBOUND_AS_DIST}"
     elif PLOTTING_ENV == "MPC-taskconditions":
         plot_filename_ID = f"MPC/{common_simulation_subdir}/{USER_ID}/{common_taskcondition_subdir}/{'STUDY_' if STUDY_ONLY else ''}{_plot_JOINT_ID}{_plot_DEVIATION}{_plot_PHASESPACE}{_plot_VEL_ACC}{_plot_TARGET_ID}{_plot_METATRIAL_ID}{_plot_AGGREGATE}{_plot_RANGE}{_plot_EFFECTIVE_PROJECTION_PATH}{_plot_USE_TARGETBOUND_AS_DIST}"
-    elif PLOTTING_ENV == "MPC-userstudy" or PLOTTING_ENV == "MPC-userstudy-baselineonly":
+    elif PLOTTING_ENV == "MPC-userstudy" or PLOTTING_ENV == "MPC-userstudy-baselineonly" or PLOTTING_ENV == "MPC-simvsuser-colored":
         plot_filename_ID = f"MPC/{common_simulation_subdir}/{USER_ID_FIXED}_FIXED/{TASK_CONDITION}/{_plot_JOINT_ID}{_plot_DEVIATION}{_plot_PHASESPACE}{_plot_VEL_ACC}{_plot_TARGET_ID}{_plot_METATRIAL_ID}{_plot_AGGREGATE}{_plot_RANGE}{_plot_EFFECTIVE_PROJECTION_PATH}{_plot_USE_TARGETBOUND_AS_DIST}"
     elif PLOTTING_ENV == "MPC-betweenuser":
         plot_filename_ID = f"MPC/{common_simulation_subdir}/{user_list_string}/{TASK_CONDITION}/{_plot_JOINT_ID}{_plot_DEVIATION}{_plot_PHASESPACE}{_plot_VEL_ACC}{_plot_TARGET_ID}{_plot_METATRIAL_ID}{_plot_AGGREGATE}{_plot_RANGE}{_plot_EFFECTIVE_PROJECTION_PATH}{_plot_USE_TARGETBOUND_AS_DIST}"
@@ -324,6 +324,21 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
 
             if TARGET_IDS is None:  #between-user comparison
                 trajectories_info.extend([(trajectories, {'linestyle': ':', 'label': 'Other Users', 'color': matplotlib.cm.get_cmap('turbo')(0.2), 'alpha': 0.8}, {'alpha': 0.2}, "") for i, trajectories in enumerate(trajectories_SUPPLEMENTARY) if trajectories.USER_ID != USER_ID_FIXED])
+    elif PLOTTING_ENV == "MPC-simvsuser-colored":
+        ## MPC - Simulation vs. User comparisons of single cost function
+        trajectories_SIMULATION.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS,
+                                                N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS,
+                                                ignore_trainingset_trials=ignore_trainingset_trials_mpc_userstudy)  # MPC
+        trajectories_info = [(trajectories_SIMULATION,
+                              {'linestyle': '-', 'label': 'Simulation', 'target_cmap': 'nipy_spectral'},
+                              {'alpha': 0.2, }, "")]
+        if SHOW_STUDY:
+            trajectories_STUDY.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS,
+                                               N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS_STUDY,
+                                               ignore_trainingset_trials=ignore_trainingset_trials_mpc_userstudy)
+            trajectories_info.append((trajectories_STUDY,
+                                      {'linestyle': '--', 'label': f'Study', 'target_cmap': 'nipy_spectral'},
+                                      {'alpha': 0.2}, ""))
     elif PLOTTING_ENV == "MPC-betweenuser":
         ## MPC - Between-user comparisons: A simulation class incorporating different users vs. a study class incorporating different users
         trajectories_SIMULATION.compute_indices(TARGET_IDS=TARGET_IDS, TRIAL_IDS=TRIAL_IDS, META_IDS=META_IDS, N_MOVS=N_MOVS, AGGREGATION_VARS=AGGREGATION_VARS, ignore_trainingset_trials=True)  #MPC
