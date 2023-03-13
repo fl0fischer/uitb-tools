@@ -529,7 +529,10 @@ def trajectoryplot(PLOTTING_ENV, USER_ID, TASK_CONDITION,
                 assert not PLOT_RANGES, "ERROR: Cannot plot ranges, as no trials were aggregated!"
 
                 trajectories.compute_trial(episode_index_current, effective_projection_path=EFFECTIVE_PROJECTION_PATH, targetbound_as_target=trajectories.SHOW_MINJERK if USE_TARGETBOUND_AS_DIST == "MinJerk-only" else USE_TARGETBOUND_AS_DIST, compute_deviation=PLOT_DEVIATION, normalize_time=NORMALIZE_TIME)
-
+                
+                if not PLOT_ENDEFFECTOR:
+                    assert trajectories.qpos_available and trajectories.qvel_available and trajectories.qacc_available, f"Joint values are not available for trajectories of type '{type(trajectories_STUDY).__name__}'. Set PLOT_ENDEFFECTOR=True."
+                
                 projected_or_joint_trajectory_pos = trajectories.projected_trajectories_pos_trial if PLOT_ENDEFFECTOR else trajectories.qpos_series_trial[:, JOINT_ID]
                 projected_or_joint_trajectory_vel = trajectories.projected_trajectories_vel_trial if PLOT_ENDEFFECTOR else trajectories.qvel_series_trial[:, JOINT_ID]
                 projected_or_joint_trajectory_acc = trajectories.projected_trajectories_acc_trial if PLOT_ENDEFFECTOR else trajectories.qacc_series_trial[:, JOINT_ID]
