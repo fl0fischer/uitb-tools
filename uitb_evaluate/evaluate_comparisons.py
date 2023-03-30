@@ -88,7 +88,7 @@ def quantitativecomparisonplot(PLOTTING_ENV_COMPARISON, QUANTITY, res_dict,
     else:
         boxplot_df = pd.DataFrame({map_conditions(k): pd.Series(np.concatenate(v).ravel()) for k, v in res_dict.items()})
 
-        sns.boxplot(data=boxplot_df, ax=quantitative_comparison_ax, palette=[matplotlib.cm.get_cmap(COLOR_PALETTE)(0.2 if i.startswith("U") else 0.75) for i in boxplot_df.columns] if USER2USER or USER2USER_FIXED else COLOR_PALETTE)
+        sns.boxplot(data=boxplot_df, ax=quantitative_comparison_ax, palette=[matplotlib.colormaps[COLOR_PALETTE](0.2 if i.startswith("U") else 0.75) for i in boxplot_df.columns] if USER2USER or USER2USER_FIXED else COLOR_PALETTE)
 
     # Add statistics annotations:
     if USER2USER_FIXED:
