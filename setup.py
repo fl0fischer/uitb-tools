@@ -14,6 +14,6 @@ setup(
    install_requires=[
        # "gym", #>=0.26.0",
        # "mujoco>=2.2.0",
-       "numpy", "matplotlib", "scipy", "pandas"
+       "numpy", "matplotlib", "scipy", "pandas", "seaborn"
    ],
 )
